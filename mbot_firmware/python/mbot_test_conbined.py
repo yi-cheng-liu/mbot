@@ -1,0 +1,66 @@
+# import pygame
+# from pygame.locals import *
+import time
+import numpy as np
+import lcm
+import sys
+sys.path.append('/usr/lib/python3.9/site-packages/')
+from mbot_lcm_msgs.twist2D_t import twist2D_t
+from mbot_lcm_msgs.pose2D_t import pose2D_t
+
+LIN_VEL_CMD = 100.0 # rad/s
+ANG_VEL_CMD = 50.0 # rad/s
+
+def my_handler(channel, data):
+    msg = pose2D_t.decode(data)
+    print("Received message on channel \"%s\"" % channel)
+    print("   timestamp   = %s" % str(msg.timestamp))
+    print("   position    = %s" % str(msg.position))
+    print("   orientation = %s" % str(msg.orientation))
+    print("   ranges: %s" % str(msg.ranges))
+    print("   name        = '%s'" % msg.name)
+    print("   enabled     = %s" % str(msg.enabled))
+    print("")
+
+lc = lcm.LCM()
+subscription = lc.subscribe("EXAMPLE", my_handler)
+
+
+lc = lcm.LCM("udpm://239.255.76.67:7667?ttl=1")
+# pygame.init()
+# pygame.display.set_caption("MBot TeleOp")
+# screen = pygame.display.set_mode([100,100])
+# pygame.key.set_repeat(5)
+# time.sleep(0.5)
+running = True
+fwd_vel = 0.
+turn_vel = 0.
+# while(running):
+
+#     for event in pygame.event.get()
+#         if event.type==pygame.QUIT:
+        #     running = False
+        #     pygame.quit()
+        #     sys.exit()
+        # key_input = pygame.key.get_pressed()  
+        # if(~key_input[pygame.K_LEFT] & ~key_input[pygame.K_LEFT] & ~key_input[pygame.K_LEFT] & ~key_input[pygame.K_LEFT]):
+        #     turn_vel = 0
+        #     fwd_vel = 0
+        # if key_input[pygame.K_UP]:
+        #     fwd_vel = LIN_VEL_CMD
+        # elif key_input[pygame.K_DOWN]:
+        #     fwd_vel = -LIN_VEL_CMD
+        # else:
+        #     fwd_vel = 0
+        # if key_input[pygame.K_LEFT]:
+        #     turn_vel = ANG_VEL_CMD
+        # elif key_input[pygame.K_RIGHT]:
+        #     turn_vel = -ANG_VEL_CMD
+        # else:
+        #     turn_vel = 0.0
+command = twist2D_t()
+command.vx = fwd_vel
+command.vy = 0
+command.wz = turn_vel
+lc.publish("MBOT_VEL_CMD",command.encode())
+time.sleep(0.05)
